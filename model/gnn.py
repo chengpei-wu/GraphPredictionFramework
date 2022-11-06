@@ -1,9 +1,10 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from dgl.nn.pytorch.conv import GINConv
 
-from model.mlp import MLP
 from model.cnn import CNN
+from model.mlp import MLP
 
 
 class GIN(nn.Module):
@@ -22,17 +23,16 @@ class GIN(nn.Module):
             )
             self.batch_norms.append(nn.BatchNorm1d(hidden_dim))
             self.cnn = CNN(output_dim)
-            self.flatten = nn.Flatten()
 
-    def forward(self, g, h):
+    def forward(self, g):
+        h = g.in_degrees().view(-1, 1).float()
         hidden_rep = [h]
         for i, layer in enumerate(self.ginlayers):
             h = layer(g, h)
             h = self.batch_norms[i](h)
             h = F.relu(h)
             hidden_rep.append(h)
-        print(h.shape)
+        h = torch.unsqueeze(h, dim=0)
         h = self.cnn(h)
-        h = F.adaptive_avg_pool2d(h, (1, 1))
-        h = self.flatten(h)
+        # print(h)
         return h

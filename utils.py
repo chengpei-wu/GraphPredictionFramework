@@ -1,8 +1,8 @@
+import dgl
 import torch
 
-a = torch.tensor([1, 2, 3, 4])
-b = torch.tensor([1, 2, 1, 2])
 
-a += b
-
-print(a)
+def collate(samples):
+    graphs, labels = map(list, zip(*samples))
+    loop_graphs = [dgl.add_self_loop(graph) for graph in graphs]
+    return dgl.batch(loop_graphs), torch.tensor(labels, dtype=torch.long)
