@@ -1,3 +1,4 @@
+import dgl
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -23,6 +24,10 @@ class GIN(nn.Module):
             )
             self.batch_norms.append(nn.BatchNorm1d(hidden_dim))
             self.cnn = CNN(output_dim)
+            self.linear = nn.Sequential(
+                nn.Linear(16, 2)
+            )
+            self.drop = nn.Dropout(0.5)
 
     def forward(self, g):
         h = g.in_degrees().view(-1, 1).float()
@@ -33,6 +38,8 @@ class GIN(nn.Module):
             h = F.relu(h)
             hidden_rep.append(h)
         h = torch.unsqueeze(h, dim=0)
-        h = self.cnn(h)
-        # print(h)
-        return h
+        hg = self.cnn(h)
+        # g.ndata['h'] = h
+        # hg = dgl.readout_nodes(g, feat='h', op='sum')
+        # hg = self.drop(self.linear(hg))
+        return hg

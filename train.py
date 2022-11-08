@@ -1,6 +1,8 @@
 import torch.nn as nn
 import torch.optim as optim
 
+from evaluate import evaluate
+
 
 def train(model, train_loader, device):
     loss_func = nn.CrossEntropyLoss()
@@ -21,4 +23,6 @@ def train(model, train_loader, device):
             epoch_loss += loss.detach().item()
         epoch_loss /= (iter + 1)
         print(f'epoch: {epoch}, loss {epoch_loss}')
+        train_acc = evaluate(model, train_loader, device)
+        print(train_acc)
         epoch_losses.append(epoch_loss)

@@ -9,12 +9,16 @@ from model.gnn import GIN as GNN
 from train import train
 from evaluate import evaluate
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+import warnings
+
+warnings.filterwarnings("ignore", category=UserWarning)
+# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cpu')
 print(f'Use {device} for training.')
 
 data_set = TUDataset('MUTAG')
 data = np.array(data_set, dtype=object)
-labels = np.array([g[1].numpy().tolist() for g in data])
+labels = torch.tensor([g[1] for g in data]).view(-1, 1)
 
 kf = StratifiedKFold(n_splits=10, shuffle=True)
 
