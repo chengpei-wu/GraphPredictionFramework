@@ -12,8 +12,8 @@ from evaluate import evaluate
 import warnings
 
 warnings.filterwarnings("ignore", category=UserWarning)
-# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-device = torch.device('cpu')
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+# device = torch.device('cpu')
 print(f'Use {device} for training.')
 
 data_set = TUDataset('MUTAG')
